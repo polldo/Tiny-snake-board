@@ -53,15 +53,17 @@ INIT_TIMER_NOTE:
 		push	r16
 		tst		r5
 		breq	EXIT_INIT_TIMER_NOTE
-		ldi		r16, (1 << COM1A1) + (1 << COM1A0) + (1 << CS13) + (1 << CS12) + (1 << PWM1A)
+		ldi		r16, (1 << COM1A1) + (1 << COM1A0) + (1 << CS12) + (1 << CS11) + (1 << CS10) + (1 << PWM1A) ;pwm mode, prescaler 64 -> pwm freq. depends on OCR1C
 		out		TCCR1, r16
-		ldi		r16, 4
+		ldi		r16, 34				;OCR1C = 34 -> pwm freq. = 440 Hz
 		out		OCR1C, r16
-		clr		r16
+		ldi		r16, 17				;OCR1A = 34/2 -> pwm duty cicle = 50%
 		out		OCR1A, r16
 		in		r16, TIMSK
 		cbr		r16, (1<<TOIE1)
 		out		TIMSK, r16
+		clr		r16
+		out		TCNT1, r16
 EXIT_INIT_TIMER_NOTE:
 		pop		r16
 		ret
@@ -69,6 +71,7 @@ EXIT_INIT_TIMER_NOTE:
 STOP_TIMER_NOTE:
 		ldi		r16, 0x00
 		out		TCCR1, r16
+		cbi		PORTB, PB1
 		ret
 
 INIT:
